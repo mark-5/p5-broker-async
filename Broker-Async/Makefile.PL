@@ -6,7 +6,7 @@ use Module::CPANfile;
 
 my $cpanfile = Module::CPANfile->load('cpanfile');
 WriteMakefile(
-    NAME         => 'Broker-Async',
+    NAME         => 'Broker::Async',
     VERSION_FROM => 'lib/Broker/Async.pm',
     META_MERGE   => {
         'meta-spec' => { version => 2 },

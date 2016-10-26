@@ -9,7 +9,7 @@ my $prereqs  = $cpanfile->prereq_specs;
 $prereqs->{runtime}{requires}{'Broker::Async'} = 0;
 
 WriteMakefile(
-    NAME         => 'Broker-Async-POE',
+    NAME         => 'Broker::Async::POE',
     VERSION_FROM => 'lib/Broker/Async/POE.pm',
     META_MERGE   => {
         'meta-spec' => { version => 2 },
