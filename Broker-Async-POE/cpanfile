@@ -1,0 +1,7 @@
+on configure => sub {
+    requires 'Module::CPANfile';
+};
+
+on runtime => sub {
+    requires 'POE::Future';
+};
