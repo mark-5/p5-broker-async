@@ -1,3 +1,7 @@
 on configure => sub {
     requires 'Module::CPANfile';
 };
+
+on test => sub {
+    requires 'IO::Async';
+};
