@@ -11,9 +11,7 @@ perl:
   - "5.10"
 
 install:
-  - cpanm --with-configure --with-develop --installdeps --notest .
-
-before_script:
+  - cpanm --notest Carton
   - make
 
 script:
