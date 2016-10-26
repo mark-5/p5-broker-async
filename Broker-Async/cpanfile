@@ -6,3 +6,8 @@ on runtime => sub {
     requires 'Class::Tiny';
     requires 'Scalar::Util';
 };
+
+on test => sub {
+    requires 'Future';
+    requires 'Test::Fatal';
+};

@@ -72,7 +72,8 @@ sub process_queue {
         my ($worker) = $self->available or last;
         my $task     = shift @$queue;
 
-        my $f = $worker->do($task->{future}, @{ $task->{args} });
+        my $f = $worker->do(@{ $task->{args} });
+        $f->on_ready($task->{future});
         $f->on_ready(sub{ $self->process_queue });
     }
 }

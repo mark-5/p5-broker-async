@@ -10,9 +10,16 @@ use Class::Tiny qw( code ), {
     available   => sub { shift->concurrency },
 };
 
+sub BUILD {
+    my ($self) = @_;
+    for my $name (qw( code )) {
+        croak "$name attribute required" unless defined $self->$name;
+    }
+}
+
 sub do {
     weaken(my $self = shift);
-    my ($done, @args) = @_;
+    my (@args) = @_;
     if (not( $self->available )) {
         croak "worker $self is not available for work";
     }
@@ -21,8 +28,6 @@ sub do {
     if (not( blessed($f) and $f->isa('Future') )) {
         croak "code for worker $self did not return a Future: returned $f";
     }
-
-    $f->on_ready($done);
     $self->available( $self->available - 1 );
 
     return $self->futures->{$f} = $f->on_ready(sub{
