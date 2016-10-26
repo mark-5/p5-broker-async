@@ -5,6 +5,8 @@ use Broker::Async::Worker;
 use Carp;
 use Scalar::Util qw( blessed weaken );
 
+our $VERSION = "0.0.1"; # version set by makefile
+
 use Class::Tiny qw( adaptor workers ), {
     queue => sub {  [] },
 };

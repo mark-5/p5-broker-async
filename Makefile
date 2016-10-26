@@ -38,3 +38,14 @@ clean:
 		) \
 	done
 
+version:
+ifndef VERSION
+	$(error VERSION is undefined)
+endif
+	for file in $(shell find $(DISTRIBUTIONS) -name '*.pm'); \
+	do \
+		( \
+			perl -pi -e 's/(our \$$VERSION = )(.*)(; # version set by makefile)/$$1"$(VERSION)"$$3/' $$file; \
+		) \
+	done
+

@@ -4,6 +4,8 @@ use warnings;
 use Carp;
 use parent 'Broker::Async';
 
+our $VERSION = "0.0.1"; # version set by makefile
+
 use Class::Tiny qw( loop ), {
     adaptor => sub { sub { shift->new_future } },
 };
