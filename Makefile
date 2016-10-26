@@ -3,31 +3,44 @@ DISTRIBUTIONS = Broker-Async \
 				Broker-Async-IO-Async \
 				Broker-Async-POE
 
-CARTON = PERL_CARTON_CPANFILE=$(PWD)/cpanfile PERL_CARTON_PATH=$(PWD)/local carton exec
+CPANFILES = cpanfile $(foreach dist,$(DISTRIBUTIONS),$(dist)/cpanfile)
+
+DIST_MAKEFILES = $(foreach dist,$(DISTRIBUTIONS),$(dist)/Makefile)
+
+CARTON = PERL_CARTON_CPANFILE=$(PWD)/cpanfile PERL_CARTON_PATH=$(PWD)/local carton
+
+
+.SUFFIXES: .PL
+
+.PL:
+	(cd $(dir $<) && $(CARTON) exec perl Makefile.PL)
+
 
 default: build
 
 build:
-	carton install
+	$(MAKE) cpanfile.snapshot
+	$(MAKE) $(DIST_MAKEFILES)
 	for dist in $(DISTRIBUTIONS); \
 	do \
 		( \
 			cd $(PWD)/$$dist; \
-			$(CARTON) perl Makefile.PL; \
-			$(CARTON) make; \
+			$(CARTON) exec make; \
 		) \
 	done
+
+cpanfile.snapshot: $(CPANFILES)
+	$(CARTON) install
 
 test: build
 	for dist in $(DISTRIBUTIONS); \
 	do \
 		( \
 			cd $(PWD)/$$dist; \
-			$(CARTON) perl Makefile.PL; \
-			$(CARTON) make test; \
+			$(CARTON) exec make test; \
 		) \
 	done; \
-	$(CARTON) prove t
+	$(CARTON) exec prove t
 
 clean:
 	for dist in $(DISTRIBUTIONS); \
