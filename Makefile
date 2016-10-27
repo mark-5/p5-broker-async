@@ -3,7 +3,7 @@ DISTRIBUTIONS = Broker-Async \
 				Broker-Async-IO-Async \
 				Broker-Async-POE
 
-DIST_PERL5OPT = PERL5OPT="$(DISTRIBUTIONS:%=-I$(PWD)/%/lib)"
+DIST_PERL5OPT = PERL5OPT="$(foreach lib,$(wildcard Broker-Async*/lib),-I$(PWD)/$(lib))"
 
 CARTON = $(DIST_PERL5OPT) PERL_CARTON_CPANFILE=$(PWD)/cpanfile PERL_CARTON_PATH=$(PWD)/local carton
 
