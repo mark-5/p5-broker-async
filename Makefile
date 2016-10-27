@@ -16,7 +16,13 @@ CARTON = $(DIST_PERL5OPT) PERL_CARTON_CPANFILE=$(PWD)/cpanfile PERL_CARTON_PATH=
 
 default: build
 
-build: cpanfile.snapshot $(DISTRIBUTIONS:%=%/Makefile)
+
+configure: cpanfile.snapshot $(DISTRIBUTIONS:%=%/Makefile)
+
+build: configure $(DISTRIBUTIONS:%=build-%)
+
+build-%:
+	cd $(subst build-,,$@) && $(CARTON) exec make
 
 cpanfile.snapshot: cpanfile $(DISTRIBUTIONS:%=%/cpanfile)
 	$(CARTON) install
@@ -46,10 +52,15 @@ readme: README.md
 README.md: Broker-Async/lib/Broker/Async.pm
 	pod2markdown $< $@
 
-dist: $(DISTRIBUTIONS:%=%/Makefile) manifest $(DISTRIBUTIONS:%=dist-%)
+dist: configure manifest $(DISTRIBUTIONS:%=dist-%)
 
 dist-%:
 	cd $(subst dist-,,$@) && $(CARTON) exec make dist
+
+distcheck: configure $(DISTRIBUTIONS:%=distcheck-%)
+
+distcheck-%:
+	cd $(subst distcheck-,,$@) && $(CARTON) exec make distcheck
 
 manifest: $(DISTRIBUTIONS:%=%/Makefile) $(DISTRIBUTIONS:%=manifest-%)
 
