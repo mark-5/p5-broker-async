@@ -5,11 +5,73 @@ use Broker::Async::Worker;
 use Carp;
 use Scalar::Util qw( blessed weaken );
 
+=head1 NAME
+
+Broker::Async - broker tasks for multiple workers
+
+=head1 SYNOPSIS
+
+    my @workers;
+    for my $uri (@uris) {
+        my $client = SomeClient->new($uri);
+        push @workers, sub { $client->request(@_) };
+    }
+
+    my $broker = Broker::Async::AnyEvent->new(workers => \@clients);
+    for my $future (map $broker->do($_), @requests) {
+        my $result = $future->get;
+        ...
+    }
+
+=head1 DESCRIPTION
+
+This module brokers asynchronous tasks for multiple workers. A worker can be any code reference that returns L<Future>, representing work awaiting completion.
+
+Some examples of common use cases might include throttling asynchronous requests to a server, or delegating tasks to a limited number of processes
+
+If you are using a well known event loop, such as L<AnyEvent>, L<IO::Async>, or L<POE>, you will most likely want to use a dedicated subclass.
+
+=cut
+
 our $VERSION = "0.0.1"; # version set by makefile
+
+=head1 ATTRIBUTES
+
+=head2 adaptor
+
+A code reference used for generating L<Future> objects.
+Usually this is automatically set in L<Broker::Async> subclasses.
+
+=head2 workers
+
+An array ref of workers used for handling tasks.
+Can be a code reference, a hash ref of L<Broker::Async::Worker> arguments, or an L<Broker::Async::Worker> object
+
+Under the hood, code and hash references are simply used to instantiate a L<Broker::Async::Worker> object.
+See L<Broker::Async::Worker> for more documentation about how these parameters are used.
+
+=cut
 
 use Class::Tiny qw( adaptor workers ), {
     queue => sub {  [] },
 };
+
+=head1 METHODS
+
+=head2 new
+
+    my $broker = Broker::Async->new(
+        adaptor => sub { ... },
+        workers => [ sub { ... }, ... ],
+    );
+
+=head2 available
+
+    my @workers = $broker->available;
+
+Returns an array of all available workers.
+
+=cut
 
 sub available {
     my ($self) = @_;
@@ -52,6 +114,18 @@ sub BUILD {
         croak "$name attribute required" unless defined $self->$name;
     }
 }
+
+=head2 do
+
+    my $future = $broker->do($task);
+
+Send a task to an available worker.
+Returns a L<Future> object that resolves when the task is done.
+
+There is no guarantee when a task will be started, that depends on when a worker becomes a available.
+Tasks are guaranteed to be started in the order they are seen by $broker->do
+
+=cut
 
 sub do {
     my ($self, @args) = @_;

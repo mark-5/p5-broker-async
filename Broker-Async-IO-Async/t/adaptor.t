@@ -14,7 +14,7 @@ subtest 'multi-worker concurrency' => sub {
         workers => [ ($worker)x 2 ]
     );
 
-    test_adaptor($broker, 1 .. 5);
+    test_adaptor($broker, [1 .. 5]);
 };
 
 subtest 'per worker concurrency' => sub {
@@ -26,7 +26,7 @@ subtest 'per worker concurrency' => sub {
         workers => [{ code => $worker, concurrency => 2 }],
     );
 
-    test_adaptor($broker, 1 .. 5);
+    test_adaptor($broker, [1 .. 5]);
 };
 
 done_testing;

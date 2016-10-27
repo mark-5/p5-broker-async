@@ -1,6 +1,6 @@
 # NAME
 
-Broker::Async - broker tasks among multiple workers
+Broker::Async - broker tasks for multiple workers
 
 # SYNOPSIS
     my $scraper = sub {
