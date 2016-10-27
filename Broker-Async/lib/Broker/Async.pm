@@ -47,7 +47,7 @@ This is used to ensure an external event loop is active, while blocking on a fut
 =head2 workers
 
 An array ref of workers used for handling tasks.
-Can be a code reference, a hash ref of L<Broker::Async::Worker> arguments, or an L<Broker::Async::Worker> object
+Can be a code reference, a hash ref of L<Broker::Async::Worker> arguments, or a L<Broker::Async::Worker> object
 
 Under the hood, code and hash references are simply used to instantiate a L<Broker::Async::Worker> object.
 See L<Broker::Async::Worker> for more documentation about how these parameters are used.

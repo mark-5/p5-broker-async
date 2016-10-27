@@ -36,7 +36,7 @@ This is used to ensure an external event loop is active, while blocking on a fut
 ## workers
 
 An array ref of workers used for handling tasks.
-Can be a code reference, a hash ref of [Broker::Async::Worker](https://metacpan.org/pod/Broker::Async::Worker) arguments, or an [Broker::Async::Worker](https://metacpan.org/pod/Broker::Async::Worker) object
+Can be a code reference, a hash ref of [Broker::Async::Worker](https://metacpan.org/pod/Broker::Async::Worker) arguments, or a [Broker::Async::Worker](https://metacpan.org/pod/Broker::Async::Worker) object
 
 Under the hood, code and hash references are simply used to instantiate a [Broker::Async::Worker](https://metacpan.org/pod/Broker::Async::Worker) object.
 See [Broker::Async::Worker](https://metacpan.org/pod/Broker::Async::Worker) for more documentation about how these parameters are used.
