@@ -46,6 +46,15 @@ readme: README.md
 README.md: Broker-Async/lib/Broker/Async.pm
 	pod2markdown $< $@
 
+dist: $(DISTRIBUTIONS:%=%/Makefile) manifest $(DISTRIBUTIONS:%=dist-%)
+
+dist-%:
+	cd $(subst dist-,,$@) && $(CARTON) exec make dist
+
+manifest: $(DISTRIBUTIONS:%=%/Makefile) $(DISTRIBUTIONS:%=manifest-%)
+
+manifest-%:
+	cd $(subst manifest-,,$@) && $(CARTON) exec make manifest
 
 version:
 ifndef VERSION

@@ -29,7 +29,7 @@ This module brokers asynchronous tasks for multiple workers. A worker can be any
 
 Some examples of common use cases might include throttling asynchronous requests to a server, or delegating tasks to a limited number of processes
 
-If you are using a well known event loop, such as L<AnyEvent>, L<IO::Async>, or L<POE>, you will most likely want to use a dedicated subclass.
+If you are using a well known event loop, such as L<AnyEvent>, L<IO::Async>, or L<POE>, you will most likely want to use a dedicated subclass. See L<Broker::Async::AnyEvent>, L<Broker::Async::IO::Async>, or L<Broker::Async::POE>.
 
 =cut
 

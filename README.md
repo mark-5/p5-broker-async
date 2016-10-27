@@ -22,7 +22,7 @@ This module brokers asynchronous tasks for multiple workers. A worker can be any
 
 Some examples of common use cases might include throttling asynchronous requests to a server, or delegating tasks to a limited number of processes
 
-If you are using a well known event loop, such as [AnyEvent](https://metacpan.org/pod/AnyEvent), [IO::Async](https://metacpan.org/pod/IO::Async), or [POE](https://metacpan.org/pod/POE), you will most likely want to use a dedicated subclass.
+If you are using a well known event loop, such as [AnyEvent](https://metacpan.org/pod/AnyEvent), [IO::Async](https://metacpan.org/pod/IO::Async), or [POE](https://metacpan.org/pod/POE), you will most likely want to use a dedicated subclass. See [Broker::Async::AnyEvent](https://metacpan.org/pod/Broker::Async::AnyEvent), [Broker::Async::IO::Async](https://metacpan.org/pod/Broker::Async::IO::Async), or [Broker::Async::POE](https://metacpan.org/pod/Broker::Async::POE).
 
 # ATTRIBUTES
 
