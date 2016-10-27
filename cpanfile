@@ -8,3 +8,7 @@ on test => sub {
     requires 'Test::Pod', '1.00';
     requires 'Test::Strict';
 };
+
+on develop => sub {
+    requires 'Pod::Markdown';
+};

@@ -18,7 +18,7 @@ default: build
 
 build: cpanfile.snapshot $(DISTRIBUTIONS:%=%/Makefile)
 
-cpanfile.snapshot: $(DISTRIBUTIONS:%=%/cpanfile)
+cpanfile.snapshot: cpanfile $(DISTRIBUTIONS:%=%/cpanfile)
 	$(CARTON) install
 
 
@@ -39,6 +39,12 @@ clean: $(DISTRIBUTIONS:%=clean-%)
 
 clean-%:
 	cd $(subst clean-,,$@) && $(CARTON) exec make clean
+
+
+readme: README.md
+
+README.md: Broker-Async/lib/Broker/Async.pm
+	pod2markdown $< $@
 
 
 version:
