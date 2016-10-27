@@ -3,11 +3,7 @@ DISTRIBUTIONS = Broker-Async \
 				Broker-Async-IO-Async \
 				Broker-Async-POE
 
-CPANFILES = cpanfile $(foreach dist,$(DISTRIBUTIONS),$(PWD)/$(dist)/cpanfile)
-
-DIST_MAKEFILES = $(foreach dist,$(DISTRIBUTIONS),$(PWD/)$(dist)/Makefile)
-
-DIST_PERL5OPT = PERL5OPT="$(foreach dist,$(DISTRIBUTIONS),-I$(PWD)/$(dist)/lib)"
+DIST_PERL5OPT = PERL5OPT="$(DISTRIBUTIONS:%=-I$(PWD)/%/lib)"
 
 CARTON = $(DIST_PERL5OPT) PERL_CARTON_CPANFILE=$(PWD)/cpanfile PERL_CARTON_PATH=$(PWD)/local carton
 
@@ -15,43 +11,31 @@ CARTON = $(DIST_PERL5OPT) PERL_CARTON_CPANFILE=$(PWD)/cpanfile PERL_CARTON_PATH=
 .SUFFIXES: .PL
 
 .PL:
-	(cd $(dir $<) && $(CARTON) exec perl Makefile.PL)
+	cd $(dir $<) && $(CARTON) exec perl Makefile.PL
 
 
 default: build
 
-build:
-	$(MAKE) cpanfile.snapshot
-	$(MAKE) $(DIST_MAKEFILES)
-	for dist in $(DISTRIBUTIONS); \
-	do \
-		( \
-			cd $(PWD)/$$dist; \
-			$(CARTON) exec make; \
-		) \
-	done
+build: cpanfile.snapshot $(DISTRIBUTIONS:%=%/Makefile)
 
-cpanfile.snapshot: $(CPANFILES)
+cpanfile.snapshot: $(DISTRIBUTIONS:%=%/cpanfile)
 	$(CARTON) install
 
-test: build
-	for dist in $(DISTRIBUTIONS); \
-	do \
-		( \
-			cd $(PWD)/$$dist; \
-			$(CARTON) exec make test; \
-		) \
-	done; \
+
+test: build prove $(DISTRIBUTIONS:%=test-%)
+
+prove:
 	$(CARTON) exec prove t
 
-clean:
-	for dist in $(DISTRIBUTIONS); \
-	do \
-		( \
-			cd $(PWD)/$$dist; \
-			make clean; \
-		) \
-	done
+test-%:
+	cd $(subst test-,,$@) && $(CARTON) exec make test
+
+
+clean: $(DISTRIBUTIONS:%=clean-%)
+
+clean-%:
+	cd $(subst clean-,,$@) && $(CARTON) exec make clean
+
 
 version:
 ifndef VERSION
@@ -59,8 +43,6 @@ ifndef VERSION
 endif
 	for file in $(shell find $(DISTRIBUTIONS) -name '*.pm'); \
 	do \
-		( \
-			perl -pi -e 's/(our \$$VERSION = )(.*)(; # version set by makefile)/$$1"$(VERSION)"$$3/' $$file; \
-		) \
+		perl -pi -e 's/(our \$$VERSION = )(.*)(; # version set by makefile)/$$1"$(VERSION)"$$3/' $$file; \
 	done
 
