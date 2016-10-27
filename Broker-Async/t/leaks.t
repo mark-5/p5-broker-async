@@ -9,7 +9,7 @@ use Test::More;
 subtest constructor => sub {
     no_leaks_ok {
         my $broker = Broker::Async->new(
-            adaptor => sub { Future->new },
+            engine  => sub { Future->new },
             workers => [sub { Future->new }],
         );
     } 'no leaks constructing broker';
@@ -23,7 +23,7 @@ subtest constructor => sub {
 
 subtest 'multi-worker concurrency' => sub {
     my $broker = Broker::Async->new(
-        adaptor => sub { Future->new },
+        engine  => sub { Future->new },
         workers => [ (sub{ $_[0] })x 2 ],
     );
 
@@ -37,7 +37,7 @@ subtest 'multi-worker concurrency' => sub {
 
 subtest 'per worker concurrency' => sub {
     my $broker = Broker::Async->new(
-        adaptor => sub { Future->new },
+        engine  => sub { Future->new },
         workers => [{code => sub{ $_[0] }, concurrency => 2}],
     );
 

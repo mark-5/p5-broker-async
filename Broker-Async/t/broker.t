@@ -15,7 +15,7 @@ subtest 'multi-worker concurrency' => sub {
     };
 
     my $broker = Broker::Async->new(
-        adaptor => sub { Future->new },
+        engine  => sub { Future->new },
         workers => [ ($code)x 2 ],
     );
 
@@ -36,7 +36,7 @@ subtest 'per worker concurrency' => sub {
     };
 
     my $broker = Broker::Async->new(
-        adaptor => sub { Future->new },
+        engine  => sub { Future->new },
         workers => [{code => $code, concurrency => 2}],
     );
 
@@ -51,7 +51,7 @@ subtest 'worker constructor' => sub {
     subtest 'from code' => sub {
         my $code   = sub { Future->done };
         my $broker = Broker::Async->new(
-            adaptor => sub { Future->new },
+            engine  => sub { Future->new },
             workers => [ $code ],
         );
 
@@ -64,7 +64,7 @@ subtest 'worker constructor' => sub {
         my $code   = sub { Future->done };
         my $max    = 5;
         my $broker = Broker::Async->new(
-            adaptor => sub { Future->new },
+            engine  => sub { Future->new },
             workers => [{code => $code, concurrency => $max}],
         );
 
@@ -76,7 +76,7 @@ subtest 'worker constructor' => sub {
     subtest 'from worker object' => sub {
         my $worker = Broker::Async::Worker->new(code => sub { Future->new });
         my $broker = Broker::Async->new(
-            adaptor => sub { Future->new },
+            engine  => sub { Future->new },
             workers => [ $worker ],
         );
         is $broker->workers->[0], $worker, 'broker uses worker as is';

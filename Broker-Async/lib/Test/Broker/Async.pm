@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use parent 'Exporter';
 our @EXPORT_OK = qw(
-    test_adaptor
+    test_engine
 );
 
 =head1 NAME
@@ -16,11 +16,11 @@ A testing library used for Broker::Async subclasses.
 
 =head1 FUNCTIONS
 
-=head2 test_adaptor
+=head2 test_engine
 
-    my $success = test_adaptor($broker, \@tasks, 'my adaptor');
+    my $success = test_engine($broker, \@tasks, 'my engine');
 
-Tests that the adaptor used in $broker can move tasks through $broker's interal queue.
+Tests that the engine used in $broker can move tasks through $broker's interal queue.
 
 =cut
 
@@ -30,7 +30,7 @@ sub ready {
     return scalar(@ready);
 }
 
-sub test_adaptor {
+sub test_engine {
     local $Test::Builder::Level = $Test::Builder::Level + 1;
     my ($broker, $tasks, $desc) = @_;
     $tasks = [1 .. 3] unless $tasks or @$tasks;

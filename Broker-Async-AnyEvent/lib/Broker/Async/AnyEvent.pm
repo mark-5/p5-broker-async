@@ -22,7 +22,7 @@ See L<Broker::Async> for documentation about how to use the broker.
 our $VERSION = "0.0.1"; # version set by makefile
 
 use Class::Tiny qw(), {
-    adaptor => sub { sub{ AnyEvent::Future->new } },
+    engine => sub { sub{ AnyEvent::Future->new } },
 };
 
 1;

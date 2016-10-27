@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Broker::Async::POE;
 use POE::Future;
-use Test::Broker::Async qw(test_adaptor);
+use Test::Broker::Async qw(test_engine);
 use Test::More;
 
 use POE;
@@ -14,7 +14,7 @@ subtest 'multi-worker concurrency' => sub {
         workers => [ ($worker)x 2 ]
     );
 
-    test_adaptor($broker, [1 .. 5]);
+    test_engine($broker, [1 .. 5]);
 };
 
 subtest 'per worker concurrency' => sub {
@@ -23,7 +23,7 @@ subtest 'per worker concurrency' => sub {
         workers => [{ code => $worker, concurrency => 2 }],
     );
 
-    test_adaptor($broker, [1 .. 5]);
+    test_engine($broker, [1 .. 5]);
 };
 
 done_testing;

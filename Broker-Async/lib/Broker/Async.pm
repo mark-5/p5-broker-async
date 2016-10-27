@@ -37,10 +37,12 @@ our $VERSION = "0.0.1"; # version set by makefile
 
 =head1 ATTRIBUTES
 
-=head2 adaptor
+=head2 engine
 
 A code reference used for generating L<Future> objects.
 Usually this is automatically set in L<Broker::Async> subclasses.
+
+This is used to ensure an external event loop is active, while blocking on a future result.
 
 =head2 workers
 
@@ -52,7 +54,7 @@ See L<Broker::Async::Worker> for more documentation about how these parameters a
 
 =cut
 
-use Class::Tiny qw( adaptor workers ), {
+use Class::Tiny qw( engine workers ), {
     queue => sub {  [] },
 };
 
@@ -61,7 +63,7 @@ use Class::Tiny qw( adaptor workers ), {
 =head2 new
 
     my $broker = Broker::Async->new(
-        adaptor => sub { ... },
+        engine => sub { ... },
         workers => [ sub { ... }, ... ],
     );
 
@@ -110,7 +112,7 @@ sub BUILDARGS {
 
 sub BUILD {
     my ($self) = @_;
-    for my $name (qw( adaptor workers )) {
+    for my $name (qw( engine workers )) {
         croak "$name attribute required" unless defined $self->$name;
     }
 }
@@ -129,9 +131,9 @@ Tasks are guaranteed to be started in the order they are seen by $broker->do
 
 sub do {
     my ($self, @args) = @_;
-    my $f = $self->adaptor->($self);
+    my $f = $self->engine->($self);
     if (not( blessed($f) and $f->isa('Future') )) {
-        croak "adaptor @{[ $self->adaptor ]} did not return a Future: returned $f";
+        croak "engine @{[ $self->engine ]} did not return a Future: returned $f";
     }
 
     push @{ $self->queue }, {args => \@args, future => $f};

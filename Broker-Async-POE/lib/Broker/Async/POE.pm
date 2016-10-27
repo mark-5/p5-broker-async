@@ -22,7 +22,7 @@ See L<Broker::Async> for documentation about how to use the broker.
 our $VERSION = "0.0.1"; # version set by makefile
 
 use Class::Tiny {
-    adaptor => sub { sub { POE::Future->new } },
+    engine => sub { sub { POE::Future->new } },
 };
 
 1;

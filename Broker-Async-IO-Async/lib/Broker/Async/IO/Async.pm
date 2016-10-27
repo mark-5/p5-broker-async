@@ -32,7 +32,7 @@ The IO::Async::Loop used to generate futures.
 our $VERSION = "0.0.1"; # version set by makefile
 
 use Class::Tiny qw( loop ), {
-    adaptor => sub { sub { shift->loop->new_future } },
+    engine => sub { sub { shift->loop->new_future } },
 };
 
 sub BUILD {

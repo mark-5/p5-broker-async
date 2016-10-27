@@ -12,18 +12,18 @@ use Test::More;
 
 subtest 'arguments' => sub {
     my @args;
-    my $adaptor = sub {
+    my $engine = sub {
         @args = @_;
         return Future->new
     };
     
     my $broker = Broker::Async->new(
-        adaptor => $adaptor,
+        engine  => $engine,
         workers => [sub{ Future->new }],
     );
     my $f = $broker->do();
 
-    is_deeply \@args, [$broker], 'adaptor is passed broker';
+    is_deeply \@args, [$broker], 'engine is passed broker';
 };
 
 subtest 'return value' => sub {
@@ -44,39 +44,39 @@ subtest 'return value' => sub {
     );
 
     my $create = sub {
-        my ($adaptor) = @_;
+        my ($engine) = @_;
         return Broker::Async->new(
-            adaptor => $adaptor,
+            engine  => $engine,
             workers => [sub{ Future->new }],
         );
     };
 
     for my $type (sort keys %types) {
-        my $adaptor = $types{$type}{code};
+        my $engine = $types{$type}{code};
         if ($types{$type}{happy}) {
-            lives_ok { $create->($adaptor)->do } "adaptor can return $type";
+            lives_ok { $create->($engine)->do } "engine can return $type";
         } else {
-            dies_ok { $create->($adaptor)->do } "fatal error for adaptor returning $type";
+            dies_ok { $create->($engine)->do } "fatal error for engine returning $type";
         }
     }
 };
 
 subtest 'use' => sub {
     my $future;
-    my $adaptor = sub {
+    my $engine = sub {
         return $future = Future->new;
     };
     
     my $broker = Broker::Async->new(
-        adaptor => $adaptor,
+        engine  => $engine,
         workers => [sub{ Future->new }],
     );
 
     my $result = $broker->do();
-    ok not($result->is_ready), 'broker result is not ready until adaptor acts on it';
+    ok not($result->is_ready), 'broker result is not ready until engine acts on it';
 
     $future->done;
-    ok $result->is_ready, 'broker result is ready when adaptor resolves the future';
+    ok $result->is_ready, 'broker result is ready when engine resolves the future';
 };
 
 done_testing;
