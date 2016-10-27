@@ -30,6 +30,10 @@ prove:
 test-%:
 	cd $(subst test-,,$@) && $(CARTON) exec make test
 
+cover: build $(DISTRIBUTIONS:%=cover-%)
+
+cover-%:
+	cd $(subst cover-,,$@) && $(CARTON) exec -- cover -test
 
 clean: $(DISTRIBUTIONS:%=clean-%)
 

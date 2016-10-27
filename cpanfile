@@ -5,7 +5,6 @@ on configure => sub {
 };
 
 on test => sub {
-    requires 'Test::LeakTrace';
     requires 'Test::Pod', '1.00';
     requires 'Test::Strict';
 };

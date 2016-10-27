@@ -10,4 +10,5 @@ on runtime => sub {
 on test => sub {
     requires 'Future';
     requires 'Test::Fatal';
+    requires 'Test::LeakTrace';
 };
