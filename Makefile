@@ -3,11 +3,13 @@ DISTRIBUTIONS = Broker-Async \
 				Broker-Async-IO-Async \
 				Broker-Async-POE
 
-CPANFILES = cpanfile $(foreach dist,$(DISTRIBUTIONS),$(dist)/cpanfile)
+CPANFILES = cpanfile $(foreach dist,$(DISTRIBUTIONS),$(PWD)/$(dist)/cpanfile)
 
-DIST_MAKEFILES = $(foreach dist,$(DISTRIBUTIONS),$(dist)/Makefile)
+DIST_MAKEFILES = $(foreach dist,$(DISTRIBUTIONS),$(PWD/)$(dist)/Makefile)
 
-CARTON = PERL_CARTON_CPANFILE=$(PWD)/cpanfile PERL_CARTON_PATH=$(PWD)/local carton
+DIST_PERL5OPT = PERL5OPT="$(foreach dist,$(DISTRIBUTIONS),-I$(PWD)/$(dist)/lib)"
+
+CARTON = $(DIST_PERL5OPT) PERL_CARTON_CPANFILE=$(PWD)/cpanfile PERL_CARTON_PATH=$(PWD)/local carton
 
 
 .SUFFIXES: .PL
