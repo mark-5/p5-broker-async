@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-use Broker::Async::AnyEvent;
+use Broker::Async;
 use Future;
 use Future::HTTP;
 
@@ -9,7 +9,7 @@ my $scraper = sub {
     Future::HTTP->new->http_get(@_);
 };
 
-my $broker = Broker::Async::AnyEvent->new(
+my $broker = Broker::Async->new(
     workers => [{code => $scraper, concurrency => $throttle}],
 );
 

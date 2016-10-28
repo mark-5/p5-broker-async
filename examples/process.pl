@@ -49,13 +49,13 @@ sub new {
 }
 
 package main;
-use Broker::Async::AnyEvent;
+use Broker::Async;
 use Future;
 
 my @numbers   = @ARGV;
 my @processes = map MyProcess->new, 1 .. 5;
 my @workers   = map { my $proc = $_; sub { $proc->request(@_) } } @processes;
-my $broker    = Broker::Async::AnyEvent->new(workers => \@workers);
+my $broker    = Broker::Async->new(workers => \@workers);
 
 my @results;
 for my $num (@numbers) {

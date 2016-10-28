@@ -10,7 +10,7 @@ Broker::Async - broker tasks for multiple workers
         push @workers, sub { $client->request(@_) };
     }
 
-    my $broker = Broker::Async::AnyEvent->new(workers => \@clients);
+    my $broker = Broker::Async->new(workers => \@clients);
     for my $future (map $broker->do($_), @requests) {
         my $result = $future->get;
         ...
@@ -22,16 +22,7 @@ This module brokers asynchronous tasks for multiple workers. A worker can be any
 
 Some examples of common use cases might include throttling asynchronous requests to a server, or delegating tasks to a limited number of processes
 
-If you are using a well known event loop, such as [AnyEvent](https://metacpan.org/pod/AnyEvent), [IO::Async](https://metacpan.org/pod/IO::Async), or [POE](https://metacpan.org/pod/POE), you will most likely want to use a dedicated subclass. See [Broker::Async::AnyEvent](https://metacpan.org/pod/Broker::Async::AnyEvent), [Broker::Async::IO::Async](https://metacpan.org/pod/Broker::Async::IO::Async), or [Broker::Async::POE](https://metacpan.org/pod/Broker::Async::POE).
-
 # ATTRIBUTES
-
-## engine
-
-A code reference used for generating [Future](https://metacpan.org/pod/Future) objects.
-Usually this is automatically set in [Broker::Async](https://metacpan.org/pod/Broker::Async) subclasses.
-
-This is used to ensure an external event loop is active, while blocking on a future result.
 
 ## workers
 
@@ -46,15 +37,8 @@ See [Broker::Async::Worker](https://metacpan.org/pod/Broker::Async::Worker) for 
 ## new
 
     my $broker = Broker::Async->new(
-        engine => sub { ... },
         workers => [ sub { ... }, ... ],
     );
-
-## available
-
-    my @workers = $broker->available;
-
-Returns an array of all available workers.
 
 ## do
 

@@ -58,6 +58,11 @@ Returns a future that will be resolved when the work is done.
 
 =cut
 
+sub active {
+    my ($self) = @_;
+    return values %{ $self->futures };
+}
+
 sub BUILD {
     my ($self) = @_;
     for my $name (qw( code )) {

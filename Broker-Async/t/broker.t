@@ -3,6 +3,7 @@ use warnings;
 use Broker::Async;
 use Broker::Async::Worker;
 use Future;
+use List::Util qw( shuffle );
 use Test::More;
 
 subtest 'multi-worker concurrency' => sub {
@@ -15,7 +16,6 @@ subtest 'multi-worker concurrency' => sub {
     };
 
     my $broker = Broker::Async->new(
-        engine  => sub { Future->new },
         workers => [ ($code)x 2 ],
     );
 
@@ -24,6 +24,30 @@ subtest 'multi-worker concurrency' => sub {
 
     $live{1}->done;
     is_deeply [sort keys %live], [2, 3], 'broker runs another task after first resolves';
+};
+
+subtest 'order of execution' => sub {
+    my $trace = {starts => [], live => []};
+    my $code = sub {
+        my ($id) = @_;
+        my $future = Future->new;
+        push @{ $trace->{starts} }, $id;
+        push @{ $trace->{live} }, $future;
+        return $future;
+    };
+    my @tasks = 1 .. 100;
+
+    my $broker = Broker::Async->new(
+        workers => [ ($code)x 10 ],
+    );
+
+    my @futures = map $broker->do($_), @tasks;
+    while (my @live = @{ $trace->{live} }) {
+        @{ $trace->{live} } = ();
+        $_->done for shuffle @live;
+    }
+
+    is_deeply $trace->{starts}, \@tasks, 'broker starts tasks in the order they are seen';
 };
 
 subtest 'per worker concurrency' => sub {
@@ -36,7 +60,6 @@ subtest 'per worker concurrency' => sub {
     };
 
     my $broker = Broker::Async->new(
-        engine  => sub { Future->new },
         workers => [{code => $code, concurrency => 2}],
     );
 
@@ -51,7 +74,6 @@ subtest 'worker constructor' => sub {
     subtest 'from code' => sub {
         my $code   = sub { Future->done };
         my $broker = Broker::Async->new(
-            engine  => sub { Future->new },
             workers => [ $code ],
         );
 
@@ -64,7 +86,6 @@ subtest 'worker constructor' => sub {
         my $code   = sub { Future->done };
         my $max    = 5;
         my $broker = Broker::Async->new(
-            engine  => sub { Future->new },
             workers => [{code => $code, concurrency => $max}],
         );
 
@@ -76,7 +97,6 @@ subtest 'worker constructor' => sub {
     subtest 'from worker object' => sub {
         my $worker = Broker::Async::Worker->new(code => sub { Future->new });
         my $broker = Broker::Async->new(
-            engine  => sub { Future->new },
             workers => [ $worker ],
         );
         is $broker->workers->[0], $worker, 'broker uses worker as is';

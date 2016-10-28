@@ -17,7 +17,7 @@ Broker::Async - broker tasks for multiple workers
         push @workers, sub { $client->request(@_) };
     }
 
-    my $broker = Broker::Async::AnyEvent->new(workers => \@clients);
+    my $broker = Broker::Async->new(workers => \@clients);
     for my $future (map $broker->do($_), @requests) {
         my $result = $future->get;
         ...
@@ -29,20 +29,11 @@ This module brokers asynchronous tasks for multiple workers. A worker can be any
 
 Some examples of common use cases might include throttling asynchronous requests to a server, or delegating tasks to a limited number of processes
 
-If you are using a well known event loop, such as L<AnyEvent>, L<IO::Async>, or L<POE>, you will most likely want to use a dedicated subclass. See L<Broker::Async::AnyEvent>, L<Broker::Async::IO::Async>, or L<Broker::Async::POE>.
-
 =cut
 
 our $VERSION = "0.0.1"; # version set by makefile
 
 =head1 ATTRIBUTES
-
-=head2 engine
-
-A code reference used for generating L<Future> objects.
-Usually this is automatically set in L<Broker::Async> subclasses.
-
-This is used to ensure an external event loop is active, while blocking on a future result.
 
 =head2 workers
 
@@ -63,57 +54,40 @@ use Class::Tiny qw( engine workers ), {
 =head2 new
 
     my $broker = Broker::Async->new(
-        engine => sub { ... },
         workers => [ sub { ... }, ... ],
     );
 
-=head2 available
-
-    my @workers = $broker->available;
-
-Returns an array of all available workers.
-
 =cut
+
+sub active {
+    my ($self) = @_;
+    return grep { $_->active } @{ $self->workers };
+}
 
 sub available {
     my ($self) = @_;
     return grep { $_->available } @{ $self->workers };
 }
 
-sub BUILDARGS {
-    my $class = shift;
-
-    my $args;
-    if (@_ == 1 and ref($_[0]) eq 'HASH') {
-        $args = { %{ $_[0] } };
-    } else {
-        $args = { @_ }
-    }
-
-    if (my $workers = $args->{workers}) {
-        croak "workers attribute must be an array ref: received $workers"
-            unless ref($workers) eq 'ARRAY';
-        $args->{workers} = $workers = [ @$workers ];
-
-        for (my $i = 0; $i < @$workers; $i++) {
-            my $worker = $workers->[$i];
-
-            my $type = ref($worker);
-            if ($type eq 'CODE') {
-                $workers->[$i] = Broker::Async::Worker->new({code => $worker});
-            } elsif ($type eq 'HASH') {
-                $workers->[$i] = Broker::Async::Worker->new($worker);
-            }
-        }
-    }
-
-    return $args;
-}
-
 sub BUILD {
     my ($self) = @_;
-    for my $name (qw( engine workers )) {
+    for my $name (qw( workers )) {
         croak "$name attribute required" unless defined $self->$name;
+    }
+
+    my $workers = $self->workers;
+    croak "workers attribute must be an array ref: received $workers"
+        unless ref($workers) eq 'ARRAY';
+
+    for (my $i = 0; $i < @$workers; $i++) {
+        my $worker = $workers->[$i];
+
+        my $type = ref($worker);
+        if ($type eq 'CODE') {
+            $workers->[$i] = Broker::Async::Worker->new({code => $worker});
+        } elsif ($type eq 'HASH') {
+            $workers->[$i] = Broker::Async::Worker->new($worker);
+        }
     }
 }
 
@@ -129,17 +103,48 @@ Tasks are guaranteed to be started in the order they are seen by $broker->do
 
 =cut
 
+
 sub do {
     my ($self, @args) = @_;
-    my $f = $self->engine->($self);
-    if (not( blessed($f) and $f->isa('Future') )) {
-        croak "engine @{[ $self->engine ]} did not return a Future: returned $f";
-    }
 
-    push @{ $self->queue }, {args => \@args, future => $f};
+    # enforces consistent order of task execution
+    # makes sure current task is only started if nothing else is queued
     $self->process_queue;
 
-    return $f;
+    my $future;
+    if (my $engine = $self->engine) {
+        $future = $self->$engine();
+        if (not( blessed($future) and $future->isa('Future') )) {
+            croak "engine $engine did not return a Future: returned $future";
+        }
+        push @{ $self->queue }, {args => \@args, future => $future};
+    } elsif (my @active_futures = map $_->active, $self->active) {
+        # generate future from an existing future
+        # see Future::_new_convergent
+        my $_future = $active_futures[0];
+        ref($_) eq "Future" or $_future = $_->new, last for @active_futures;
+
+        $future = $_future->new;
+        push @{ $self->queue }, {args => \@args, future => $future};
+    } elsif (my ($available_worker) = $self->available) {
+        # should only be here if there's nothing active and nothing queued
+        # so start the task and return it's future
+        $future = $self->do_worker($available_worker, @args);
+    }
+
+    # start any recently queued tasks, if there are available workers
+    $self->process_queue;
+    return $future;
+}
+
+sub do_worker {
+    weaken(my $self = shift);
+    my ($worker, @args) = @_;
+
+    return $worker->do(@args)->on_ready(sub{
+        # queue next task
+        $self->process_queue;
+    });
 }
 
 sub process_queue {
@@ -150,9 +155,8 @@ sub process_queue {
         my ($worker) = $self->available or last;
         my $task     = shift @$queue;
 
-        my $f = $worker->do(@{ $task->{args} });
-        $f->on_ready($task->{future});
-        $f->on_ready(sub{ $self->process_queue });
+        $self->do_worker($worker, @{$task->{args}})
+             ->on_ready($task->{future});
     }
 }
 
