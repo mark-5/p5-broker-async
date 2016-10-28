@@ -11,7 +11,8 @@ perl:
   - "5.10"
 
 install:
-  - cpanm --notest Carton
+  - cpanm --with-configure --with-develop --installdeps --notest .
+  - perl Makefile.PL
   - make
 
 script:

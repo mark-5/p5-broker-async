@@ -1,4 +1,8 @@
 .carmel
+blib
 cpanfile.snapshot
 local
+Makefile
 Makefile.old
+MYMETA.*
+pm_to_blib

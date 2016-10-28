@@ -31,7 +31,7 @@ Some examples of common use cases might include throttling asynchronous requests
 
 =cut
 
-our $VERSION = "0.0.1"; # version set by makefile
+our $VERSION = "0.0.1";
 
 =head1 ATTRIBUTES
 
