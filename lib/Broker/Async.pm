@@ -41,6 +41,7 @@ our $VERSION = "0.0.1"; # __VERSION__
 
 An array ref of workers used for handling tasks.
 Can be a code reference, a hash ref of L<Broker::Async::Worker> arguments, or a L<Broker::Async::Worker> object.
+Every invocation of a worker must return a L<Future> object.
 
 Under the hood, code and hash references are simply used to instantiate a L<Broker::Async::Worker> object.
 See L<Broker::Async::Worker> for more documentation about how these parameters are used.
@@ -95,13 +96,14 @@ sub BUILD {
 
 =head2 do
 
-    my $future = $broker->do($task);
+    my $future = $broker->do(@args);
 
-Send a task to an available worker.
-Returns a L<Future> object that resolves when the task is done.
+Queue the invocation of a worker with @args.
+@args can be any data structure, and is passed as is to a worker code ref.
+Returns a L<Future> object that resolves when the work is done.
 
-There is no guarantee when a task will be started, that depends on when a worker becomes a available.
-Tasks are guaranteed to be started in the order they are seen by $broker->do.
+There is no guarantee when a worker will be called, that depends on when a worker becomes available.
+However, calls are guaranteed to be invoked in the order they are seen by $broker->do.
 
 =cut
 

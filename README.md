@@ -32,6 +32,7 @@ Some common use cases include throttling asynchronous requests to a server, or d
 
 An array ref of workers used for handling tasks.
 Can be a code reference, a hash ref of [Broker::Async::Worker](https://metacpan.org/pod/Broker::Async::Worker) arguments, or a [Broker::Async::Worker](https://metacpan.org/pod/Broker::Async::Worker) object.
+Every invocation of a worker must return a [Future](https://metacpan.org/pod/Future) object.
 
 Under the hood, code and hash references are simply used to instantiate a [Broker::Async::Worker](https://metacpan.org/pod/Broker::Async::Worker) object.
 See [Broker::Async::Worker](https://metacpan.org/pod/Broker::Async::Worker) for more documentation about how these parameters are used.
@@ -46,13 +47,14 @@ See [Broker::Async::Worker](https://metacpan.org/pod/Broker::Async::Worker) for 
 
 ## do
 
-    my $future = $broker->do($task);
+    my $future = $broker->do(@args);
 
-Send a task to an available worker.
-Returns a [Future](https://metacpan.org/pod/Future) object that resolves when the task is done.
+Queue the invocation of a worker with @args.
+@args can be any data structure, and is passed as is to a worker code ref.
+Returns a [Future](https://metacpan.org/pod/Future) object that resolves when the work is done.
 
-There is no guarantee when a task will be started, that depends on when a worker becomes a available.
-Tasks are guaranteed to be started in the order they are seen by $broker->do.
+There is no guarantee when a worker will be called, that depends on when a worker becomes available.
+However, calls are guaranteed to be invoked in the order they are seen by $broker->do.
 
 # AUTHOR
 
