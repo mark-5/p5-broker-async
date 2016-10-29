@@ -14,7 +14,7 @@ Broker::Async - broker tasks for multiple workers
         push @workers, sub { $client->request(@_) };
     }
 
-    my $broker = Broker::Async->new(workers => \@clients);
+    my $broker = Broker::Async->new(workers => \@workers);
     for my $future (map $broker->do($_), @requests) {
         my $result = $future->get;
         ...
