@@ -5,9 +5,9 @@ use ExtUtils::MakeMaker;
 my $main = 'lib/Broker/Async.pm';
 WriteMakefile(
     NAME          => 'Broker::Async',
-    AUTHOR        => ['Mark Flickinger <maf@cpan.org>'],
+    AUTHOR        => [ 'Mark Flickinger <maf@cpan.org>' ],
     ABSTRACT_FROM => $main,
-    VERSION_FROM  => $main,
+    VERSION       => '0.0.1',
     test          => { RECURSIVE_TEST_FILES => 1 },
     META_MERGE    => {
         'meta-spec' => { version => 2 },
@@ -68,6 +68,9 @@ readme: README.md
 
 README.md: lib/Broker/Async.pm
 	pod2markdown $< $@
+
+version:
+	perl -pi -e 's/(.*)(# __VERSION__)/our \$$VERSION = "$(VERSION)"; $$2/g' `find lib -name '*.pm'`
 
 __END__
 }
