@@ -160,4 +160,14 @@ sub process_queue {
     }
 }
 
+=head1 AUTHOR
+
+Mark Flickinger E<lt>maf@cpan.orgE<gt>
+
+=head1 LICENSE
+
+This software is licensed under the same terms as Perl itself.
+
+=cut
+
 1;

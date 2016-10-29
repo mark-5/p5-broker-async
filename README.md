@@ -49,3 +49,11 @@ Returns a [Future](https://metacpan.org/pod/Future) object that resolves when th
 
 There is no guarantee when a task will be started, that depends on when a worker becomes a available.
 Tasks are guaranteed to be started in the order they are seen by $broker->do
+
+# AUTHOR
+
+Mark Flickinger <maf@cpan.org>
+
+# LICENSE
+
+This software is licensed under the same terms as Perl itself.
