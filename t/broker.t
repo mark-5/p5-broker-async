@@ -3,11 +3,11 @@ use warnings;
 use Broker::Async;
 use Broker::Async::Worker;
 use List::Util qw( shuffle );
-use Test::Broker::Async::Trace;
+use Test::Broker::Async::Utils;
 use Test::More;
 
 subtest 'multi-worker concurrency' => sub {
-    my $trace  = Test::Broker::Async::Trace->new;
+    my $trace  = new_tracer();
     my $broker = Broker::Async->new(
         workers => [ ($trace->worker)x 2 ],
     );
@@ -24,7 +24,7 @@ subtest 'multi-worker concurrency' => sub {
 };
 
 subtest 'order of execution' => sub {
-    my $trace = Test::Broker::Async::Trace->new;
+    my $trace = new_tracer();
     my %tasks = map { $_ => Future->new } 1 .. 100;
 
     my $broker = Broker::Async->new(
@@ -40,7 +40,7 @@ subtest 'order of execution' => sub {
 };
 
 subtest 'per worker concurrency' => sub {
-    my $trace = Test::Broker::Async::Trace->new;
+    my $trace = new_tracer();
 
     my $broker = Broker::Async->new(
         workers => [{code => $trace->worker, concurrency => 2}],
