@@ -2,72 +2,55 @@ use strict;
 use warnings;
 use Broker::Async;
 use Broker::Async::Worker;
-use Future;
 use List::Util qw( shuffle );
+use Test::Broker::Async::Trace;
 use Test::More;
 
 subtest 'multi-worker concurrency' => sub {
-    my %live;
-    my $code = sub {
-        my ($id)   = @_;
-        return $live{$id} = Future->new->on_ready(sub{
-            delete $live{$id};
-        });
-    };
-
+    my $trace  = Test::Broker::Async::Trace->new;
     my $broker = Broker::Async->new(
-        workers => [ ($code)x 2 ],
+        workers => [ ($trace->worker)x 2 ],
     );
 
-    my @futures = map $broker->do($_), 1 .. 3;
-    is_deeply [sort keys %live], [1, 2], 'broker doesnt concurrently run more tasks than number of workers';
+    $broker->do($_) for 1 .. 3;
+    is_deeply $trace->live,
+              [1, 2],
+              'broker doesnt concurrently run more tasks than number of workers';
 
-    $live{1}->done;
-    is_deeply [sort keys %live], [2, 3], 'broker runs another task after first resolves';
+    $trace->futures->{1}->done;
+    is_deeply $trace->live,
+              [2, 3],
+              'broker runs another task after first resolves';
 };
 
 subtest 'order of execution' => sub {
-    my $trace = {starts => [], live => []};
-    my $code = sub {
-        my ($id) = @_;
-        my $future = Future->new;
-        push @{ $trace->{starts} }, $id;
-        push @{ $trace->{live} }, $future;
-        return $future;
-    };
-    my @tasks = 1 .. 100;
+    my $trace = Test::Broker::Async::Trace->new;
+    my %tasks = map { $_ => Future->new } 1 .. 100;
 
     my $broker = Broker::Async->new(
-        workers => [ ($code)x 10 ],
+        workers => [ ($trace->worker)x 10 ],
     );
 
-    my @futures = map $broker->do($_), @tasks;
-    while (my @live = @{ $trace->{live} }) {
-        @{ $trace->{live} } = ();
-        $_->done for shuffle @live;
+    $broker->do($_) for 1 .. 100;
+    while (my @live = @{ $trace->live }) {
+        $trace->futures->{$_}->done for shuffle @live;
     }
 
-    is_deeply $trace->{starts}, \@tasks, 'broker starts tasks in the order they are seen';
+    is_deeply $trace->started, [ 1 .. 100 ], 'broker starts tasks in the order they are seen';
 };
 
 subtest 'per worker concurrency' => sub {
-    my %live;
-    my $code = sub {
-        my ($id)   = @_;
-        return $live{$id} = Future->new->on_ready(sub{
-            delete $live{$id};
-        });
-    };
+    my $trace = Test::Broker::Async::Trace->new;
 
     my $broker = Broker::Async->new(
-        workers => [{code => $code, concurrency => 2}],
+        workers => [{code => $trace->worker, concurrency => 2}],
     );
 
-    my @futures = map $broker->do($_), 1 .. 3;
-    is_deeply [sort keys %live], [1, 2], 'broker respects worker concurrency limit';
+    $broker->do($_) for 1 .. 3;
+    is_deeply $trace->live, [1, 2], 'broker respects worker concurrency limit';
 
-    $live{1}->done;
-    is_deeply [sort keys %live], [2, 3], 'broker runs another task after first resolves';
+    $trace->futures->{1}->done;
+    is_deeply $trace->live, [2, 3], 'broker runs another task after first resolves';
 };
 
 subtest 'worker constructor' => sub {

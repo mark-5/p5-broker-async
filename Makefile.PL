@@ -5,6 +5,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME         => 'Broker::Async',
     VERSION_FROM => 'lib/Broker/Async.pm',
+    test         => { RECURSIVE_TEST_FILES => 1 },
     META_MERGE   => {
         'meta-spec' => { version => 2 },
         'prereqs'   => {
@@ -18,7 +19,9 @@ WriteMakefile(
             },
             'test' => {
                 'requires' => {
+                    'parent'          => 0,
                     'Future'          => 0,
+                    'List::Util'      => 0,
                     'Test::Fatal'     => 0,
                     'Test::LeakTrace' => 0,
                     'Test::More'      => 0,
@@ -26,9 +29,12 @@ WriteMakefile(
             },
             'develop' => {
                 'requires' => {
+                    'AnyEvent::Future' => 0,
                     'CPAN::Meta'       => 0,
+                    'IO::Async'        => 0,
                     'Module::CPANfile' => 0,
                     'Pod::Markdown'    => 0,
+                    'POE::Future'      => 0,
                     'Test::Pod'        => '1.00',
                     'Test::Strict'     => 0,
                 },
@@ -49,4 +55,9 @@ README.md: lib/Broker/Async.pm
 	pod2markdown $< $@
 
 __END__
+}
+
+sub MY::test_via_harness {
+    my ($self, $perl, @tests) = @_;
+    return $self->MM::test_via_harness("HARNESS_PERL_SWITCHES=-It/lib perl", @tests);
 }
