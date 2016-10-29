@@ -118,7 +118,7 @@ sub do {
         # generate future from an existing future
         # see Future::_new_convergent
         my $_future = $active_futures[0];
-        ref($_) eq "Future" or $_future = $_->new, last for @active_futures;
+        ref($_) eq "Future" or $_future = $_, last for @active_futures;
 
         $future = $_future->new;
         push @{ $self->queue }, {args => \@args, future => $future};
