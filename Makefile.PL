@@ -30,9 +30,13 @@ WriteMakefile(
             'develop' => {
                 'requires' => {
                     'AnyEvent::Future' => 0,
+                    'AnyEvent::HTTP'   => 0,
                     'CPAN::Meta'       => 0,
+                    'Future::HTTP'     => 0,
+                    'Future::Mojo'     => 0,
                     'IO::Async'        => 0,
                     'Module::CPANfile' => 0,
+                    'Mojolicious'      => 0,
                     'Pod::Markdown'    => 0,
                     'POE::Future'      => 0,
                     'Test::Pod'        => '1.00',

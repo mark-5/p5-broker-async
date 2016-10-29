@@ -1,4 +1,23 @@
 #!/usr/bin/env perl
+package main;
+use Broker::Async;
+use Future;
+
+my @numbers   = @ARGV;
+my @processes = map MyProcess->new, 1 .. 5;
+my @workers   = map { my $proc = $_; sub { $proc->request(@_) } } @processes;
+my $broker    = Broker::Async->new(workers => \@workers);
+
+my @results;
+for my $num (@numbers) {
+    push @results, $broker->do($num)->on_ready(sub{
+        my $result = $_[0]->get;
+        warn "> got result: $num**2 = $result\n";
+    });
+}
+Future->wait_all(@results)->get;
+warn "> finished getting all results\n";
+
 package MyProcess;
 use AE;
 use AnyEvent::Future;
@@ -47,22 +66,3 @@ sub new {
         exit 0;
     }
 }
-
-package main;
-use Broker::Async;
-use Future;
-
-my @numbers   = @ARGV;
-my @processes = map MyProcess->new, 1 .. 5;
-my @workers   = map { my $proc = $_; sub { $proc->request(@_) } } @processes;
-my $broker    = Broker::Async->new(workers => \@workers);
-
-my @results;
-for my $num (@numbers) {
-    push @results, $broker->do($num)->on_ready(sub{
-        my $result = $_[0]->get;
-        warn "> got result: $num**2 = $result\n";
-    });
-}
-Future->wait_all(@results)->get;
-warn "> finished getting all results\n";

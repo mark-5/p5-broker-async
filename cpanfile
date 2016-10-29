@@ -22,9 +22,13 @@ on test => sub {
 
 on develop => sub {
     requires 'AnyEvent::Future';
+    requires 'AnyEvent::HTTP';
     requires 'CPAN::Meta';
+    requires 'Future::HTTP';
+    requires 'Future::Mojo';
     requires 'IO::Async';
     requires 'Module::CPANfile';
+    requires 'Mojolicious';
     requires 'POE::Future';
     requires 'Pod::Markdown';
     requires 'Test::Pod', '1.00';
