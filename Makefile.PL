@@ -40,6 +40,14 @@ WriteMakefile(
                 },
             },
         },
+        'resources' => {
+            'bugtracker' => {'web' => 'https://github.com/mark-5/p5-broker-async/issues'},
+            'homepage'   => 'https://github.com/mark-5/p5-broker-async',
+            'repository' => {
+                'type' => 'git',
+                'url'  => 'https://github.com/mark-5/p5-broker-async.git',
+            },
+        },
     },
 );
 
