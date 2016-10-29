@@ -2,11 +2,14 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker;
 
+my $main = 'lib/Broker/Async.pm';
 WriteMakefile(
-    NAME         => 'Broker::Async',
-    VERSION_FROM => 'lib/Broker/Async.pm',
-    test         => { RECURSIVE_TEST_FILES => 1 },
-    META_MERGE   => {
+    NAME          => 'Broker::Async',
+    AUTHOR        => ['Mark Flickinger <maf@cpan.org>'],
+    ABSTRACT_FROM => $main,
+    VERSION_FROM  => $main,
+    test          => { RECURSIVE_TEST_FILES => 1 },
+    META_MERGE    => {
         'meta-spec' => { version => 2 },
         'prereqs'   => {
             'runtime' => {
