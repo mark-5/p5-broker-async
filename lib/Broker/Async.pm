@@ -27,9 +27,9 @@ Broker::Async - broker tasks for multiple workers
 
 =head1 DESCRIPTION
 
-This module brokers asynchronous tasks for multiple workers. A worker can be any code reference that returns L<Future>, representing work awaiting completion.
+This module brokers tasks for multiple asynchronous workers. A worker can be any code reference that returns a L<Future>, representing work awaiting completion.
 
-Some examples of common use cases might include throttling asynchronous requests to a server, or delegating tasks to a limited number of processes
+Some common use cases include throttling asynchronous requests to a server, or delegating tasks to a limited number of processes.
 
 =cut
 
@@ -40,7 +40,7 @@ our $VERSION = "0.0.1";
 =head2 workers
 
 An array ref of workers used for handling tasks.
-Can be a code reference, a hash ref of L<Broker::Async::Worker> arguments, or a L<Broker::Async::Worker> object
+Can be a code reference, a hash ref of L<Broker::Async::Worker> arguments, or a L<Broker::Async::Worker> object.
 
 Under the hood, code and hash references are simply used to instantiate a L<Broker::Async::Worker> object.
 See L<Broker::Async::Worker> for more documentation about how these parameters are used.
@@ -101,7 +101,7 @@ Send a task to an available worker.
 Returns a L<Future> object that resolves when the task is done.
 
 There is no guarantee when a task will be started, that depends on when a worker becomes a available.
-Tasks are guaranteed to be started in the order they are seen by $broker->do
+Tasks are guaranteed to be started in the order they are seen by $broker->do.
 
 =cut
 
