@@ -59,5 +59,5 @@ __END__
 
 sub MY::test_via_harness {
     my ($self, $perl, @tests) = @_;
-    return $self->MM::test_via_harness("HARNESS_PERL_SWITCHES=-It/lib perl", @tests);
+    return $self->MM::test_via_harness("$perl -It/lib", @tests);
 }
