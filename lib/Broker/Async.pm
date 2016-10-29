@@ -47,7 +47,7 @@ See L<Broker::Async::Worker> for more documentation about how these parameters a
 
 =cut
 
-use Class::Tiny qw( engine workers ), {
+use Class::Tiny qw( workers ), {
     queue => sub {  [] },
 };
 
@@ -114,13 +114,7 @@ sub do {
     $self->process_queue;
 
     my $future;
-    if (my $engine = $self->engine) {
-        $future = $self->$engine();
-        if (not( blessed($future) and $future->isa('Future') )) {
-            croak "engine $engine did not return a Future: returned $future";
-        }
-        push @{ $self->queue }, {args => \@args, future => $future};
-    } elsif (my @active_futures = map $_->active, $self->active) {
+    if (my @active_futures = map $_->active, $self->active) {
         # generate future from an existing future
         # see Future::_new_convergent
         my $_future = $active_futures[0];
