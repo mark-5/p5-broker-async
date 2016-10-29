@@ -5,6 +5,11 @@ use IO::Async::Loop;
 use Test::Broker::Async::Utils;
 use Test::More;
 
+BEGIN {
+    eval { require IO::Async::Loop; 1 }
+        or plan skip_all => 'IO::Async::Loop not available';
+}
+
 subtest 'multi-worker concurrency' => sub {
     my $loop   = IO::Async::Loop->new;
     my $code   = sub { $loop->delay_future(after => 0) };
