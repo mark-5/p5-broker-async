@@ -2,6 +2,10 @@
 
 Broker::Async - broker tasks for multiple workers
 
+<div>
+    <a href="https://travis-ci.org/mark-5/p5-broker-async"><img src="https://travis-ci.org/mark-5/p5-broker-async.svg?branch=master"></a>
+</div>
+
 # SYNOPSIS
 
     my @workers;

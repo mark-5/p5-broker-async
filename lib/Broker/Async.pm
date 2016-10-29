@@ -9,6 +9,8 @@ use Scalar::Util qw( blessed weaken );
 
 Broker::Async - broker tasks for multiple workers
 
+=for html <a href="https://travis-ci.org/mark-5/p5-broker-async"><img src="https://travis-ci.org/mark-5/p5-broker-async.svg?branch=master"></a>
+
 =head1 SYNOPSIS
 
     my @workers;
