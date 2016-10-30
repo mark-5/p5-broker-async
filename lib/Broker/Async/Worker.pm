@@ -19,6 +19,7 @@ our $VERSION = "0.0.1"; # __VERSION__
 =head1 ATTRIBUTES
 
 =head2 code
+
 The code reference used to start the work.
 This will be invoked with the arguments passed to C<do>.
 
