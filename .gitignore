@@ -1,5 +1,6 @@
 .carmel
 blib
+Broker-Async-*
 cpanfile.snapshot
 local
 Makefile

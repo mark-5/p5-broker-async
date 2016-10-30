@@ -10,10 +10,13 @@ WriteMakefile(
     VERSION       => '0.0.1',
     test          => { RECURSIVE_TEST_FILES => 1 },
     META_MERGE    => {
-        'meta-spec' => { version => 2 },
-        'prereqs'   => {
+        'meta-spec'      => { version => 2 },
+        'license'        => [ 'perl_5' ],
+        'dynamic_config' => 0,
+        'prereqs' => {
             'runtime' => {
                 'requires' => {
+                    'perl'         => '5.008',
                     'Carp'         => 0,
                     'Class::Tiny'  => 0,
                     'Exporter'     => 0,

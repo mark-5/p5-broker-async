@@ -2,6 +2,7 @@ requires 'Carp';
 requires 'Class::Tiny';
 requires 'Exporter';
 requires 'Scalar::Util';
+requires 'perl', '5.008';
 
 on configure => sub {
     requires 'ExtUtils::MakeMaker';
