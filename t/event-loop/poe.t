@@ -1,7 +1,6 @@
 use strict;
 use warnings;
 use Broker::Async;
-use POE::Future;
 use Test::Broker::Async::Utils;
 use Test::More;
 
