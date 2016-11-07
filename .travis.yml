@@ -19,3 +19,15 @@ script:
   - make test TEST_VERBOSE=1
   - prove -v xt
 
+before_deploy:
+  - make manifest
+  - make dist
+
+deploy:
+  provider: releases
+  api_key: '$GITHUB_API_KEY'
+  file: 'Broker-Async-${TRAVIS_TAG}.tar.gz'
+  skip_cleanup: true
+  on:
+    tags: true
+
