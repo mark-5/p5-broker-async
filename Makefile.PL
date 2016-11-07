@@ -7,7 +7,7 @@ WriteMakefile(
     NAME          => 'Broker::Async',
     AUTHOR        => [ 'Mark Flickinger <maf@cpan.org>' ],
     ABSTRACT_FROM => $main,
-    VERSION       => '0.0.4',
+    VERSION_FROM  => $main,
     test          => { RECURSIVE_TEST_FILES => 1 },
     META_MERGE    => {
         'meta-spec'      => { version => 2 },
@@ -72,8 +72,16 @@ readme: README.md
 README.md: lib/Broker/Async.pm
 	pod2markdown $< $@
 
-version:
-	perl -pi -e 's/(.*)(# __VERSION__)/our \$$VERSION = "$(VERSION)"; $$2/g' `find lib -name '*.pm'`
+check-version:
+ifndef version
+	$(error version is undefined)
+endif
+
+release: check-version
+	perl -pi -e 's/(.*)(# __VERSION__)/our \$$VERSION = "$(version)"; $$2/g' `find lib -name '*.pm'`
+	perl -pi -e 's/(\{\{\$$NEXT\}\})/$$1\n\n$(version) @{[scalar(localtime)]}/g' Changes
+	git commit -a -m 'bump version to $(version)' && git tag $(version)
+	git push origin HEAD $(version)
 
 __END__
 }
