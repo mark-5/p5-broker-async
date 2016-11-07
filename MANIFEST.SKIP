@@ -1,11 +1,11 @@
-.carmel
-blib
-Broker-Async-*
-cpanfile.snapshot
-local
-Makefile
-Makefile.old
-MYMETA.*
-pm_to_blib
+^.carmel/
+^blib/
+^Broker-Async-*
+^cpanfile.snapshot$
+^local/
+^Makefile$
+^Makefile.old$
+^MYMETA.*
+^pm_to_blib/
 
 #!include_default
