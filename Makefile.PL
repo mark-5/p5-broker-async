@@ -7,7 +7,7 @@ WriteMakefile(
     NAME          => 'Broker::Async',
     AUTHOR        => [ 'Mark Flickinger <maf@cpan.org>' ],
     ABSTRACT_FROM => $main,
-    VERSION       => '0.0.3',
+    VERSION       => '0.0.4',
     test          => { RECURSIVE_TEST_FILES => 1 },
     META_MERGE    => {
         'meta-spec'      => { version => 2 },
