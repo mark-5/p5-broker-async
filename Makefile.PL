@@ -26,7 +26,7 @@ WriteMakefile(
             'test' => {
                 'requires' => {
                     'parent'          => 0,
-                    'Future'          => 0,
+                    'Future'          => '0.26',
                     'List::Util'      => 0,
                     'Test::Fatal'     => 0,
                     'Test::LeakTrace' => 0,

@@ -1,4 +1,5 @@
 {{$NEXT}}
+  - Add minimum versions for test modules
 
 0.0.4 Sun Nov 6 2016
   - Fix manifest skip file

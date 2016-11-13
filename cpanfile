@@ -13,7 +13,7 @@ on build => sub {
 };
 
 on test => sub {
-    requires 'Future';
+    requires 'Future', '0.26';
     requires 'List::Util';
     requires 'Test::Fatal';
     requires 'Test::LeakTrace';
