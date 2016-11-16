@@ -14,7 +14,7 @@ Used by L<Broker::Async> for tracking the state of asynchronous work.
 
 =cut
 
-our $VERSION = "0.0.4"; # __VERSION__
+our $VERSION = "0.0.5"; # __VERSION__
 
 =head1 ATTRIBUTES
 
