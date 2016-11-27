@@ -11,7 +11,7 @@ ifndef version
 	$(error version is undefined)
 endif
 
-release: check-version
+release: check-version cpanfile readme
 	perl -pi -e 's/(.*)(# __VERSION__)/our \$$VERSION = "$(version)"; $$2/g' `find lib -name '*.pm'`
 	perl -pi -e 's/(\{\{\$$NEXT\}\})/$$1\n\n$(version) @{[scalar(localtime)]}/g' Changes
 	git commit -a -m 'bump version to $(version)' && git tag $(version)
