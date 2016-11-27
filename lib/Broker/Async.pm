@@ -33,7 +33,7 @@ Some common use cases include throttling asynchronous requests to a server, or d
 
 =cut
 
-our $VERSION = "0.0.5"; # __VERSION__
+our $VERSION = "0.0.6"; # __VERSION__
 
 =head1 ATTRIBUTES
 

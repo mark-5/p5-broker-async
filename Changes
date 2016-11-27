@@ -1,4 +1,6 @@
 {{$NEXT}}
+
+0.0.6 Sun Nov 27 16:19:44 2016
   - Exclude author targets from default Makefile
 
 0.0.5 Tue Nov 15 21:21:04 2016
