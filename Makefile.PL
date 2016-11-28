@@ -6,12 +6,12 @@ my $main = 'lib/Broker/Async.pm';
 WriteMakefile(
     NAME          => 'Broker::Async',
     AUTHOR        => [ 'Mark Flickinger <maf@cpan.org>' ],
+    LICENSE       => 'perl',
     ABSTRACT_FROM => $main,
     VERSION_FROM  => $main,
     test          => { RECURSIVE_TEST_FILES => 1 },
     META_MERGE    => {
         'meta-spec'      => { version => 2 },
-        'license'        => [ 'perl_5' ],
         'dynamic_config' => 0,
         'prereqs' => {
             'runtime' => {
