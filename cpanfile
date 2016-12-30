@@ -32,6 +32,7 @@ on develop => sub {
     requires 'Mojolicious';
     requires 'POE::Future';
     requires 'Pod::Markdown';
+    requires 'Test::Kwalitee';
     requires 'Test::Pod', '1.00';
     requires 'Test::Strict';
 };

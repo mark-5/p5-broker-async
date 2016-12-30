@@ -45,6 +45,7 @@ WriteMakefile(
                     'Mojolicious'      => 0,
                     'Pod::Markdown'    => 0,
                     'POE::Future'      => 0,
+                    'Test::Kwalitee'   => 0,
                     'Test::Pod'        => '1.00',
                     'Test::Strict'     => 0,
                 },
