@@ -13,6 +13,7 @@ perl:
 install:
   - cpanm --with-configure --with-develop --installdeps --notest .
   - perl Makefile.PL
+  - make manifest
   - make
 
 script:
@@ -20,7 +21,6 @@ script:
   - prove -v xt
 
 before_deploy:
-  - make manifest
   - make dist
 
 deploy:
