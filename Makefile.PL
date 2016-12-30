@@ -64,7 +64,7 @@ WriteMakefile(
 
 
 sub MY::postamble {
-    return 'include Makefile.author' if -d '.git';
+    return 'include author.make' if -d '.git';
 }
 
 sub MY::test_via_harness {
