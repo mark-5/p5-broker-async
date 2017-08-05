@@ -1,4 +1,5 @@
 {{$NEXT}}
+  - Simplify Broker::Async constructor
   - Fix travis-ci runtime requirement
 
 0.0.6 Sun Nov 27 16:19:44 2016

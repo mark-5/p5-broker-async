@@ -54,6 +54,15 @@ subtest 'per worker concurrency' => sub {
 };
 
 subtest 'worker constructor' => sub {
+    subtest 'from array' => sub {
+        my @code   = map sub { Future->done }, 1 .. 3;
+        my $broker = Broker::Async->new( @code );
+
+        is_deeply [ map $_->code, @{ $broker->workers } ],
+                  \@code,
+                  'workers use code refs from constructor list';
+    };
+
     subtest 'from code' => sub {
         my $code   = sub { Future->done };
         my $broker = Broker::Async->new(
@@ -61,8 +70,8 @@ subtest 'worker constructor' => sub {
         );
 
         my $worker = $broker->workers->[0];
-        is $worker->code, $code, 'worker uses code argument';
-        is $worker->concurrency, 1, 'worker has default concurrency of 1';
+        is $worker->code,        $code, 'worker uses code argument';
+        is $worker->concurrency, 1,     'worker has default concurrency of 1';
     };
 
     subtest 'from hashref' => sub {
@@ -73,8 +82,8 @@ subtest 'worker constructor' => sub {
         );
 
         my $worker = $broker->workers->[0];
-        is $worker->code, $code, 'worker uses code argument';
-        is $worker->concurrency, $max, 'worker uses concurrency argument';
+        is $worker->code,        $code, 'worker uses code argument';
+        is $worker->concurrency, $max,  'worker uses concurrency argument';
     };
 
     subtest 'from worker object' => sub {

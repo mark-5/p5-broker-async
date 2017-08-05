@@ -14,7 +14,7 @@ Broker::Async - broker tasks for multiple workers
         push @workers, sub { $client->request(@_) };
     }
 
-    my $broker = Broker::Async->new(workers => \@workers);
+    my $broker = Broker::Async->new(@workers);
     for my $future (map $broker->do($_), @requests) {
         my $result = $future->get;
         ...
@@ -26,24 +26,19 @@ This module brokers tasks for multiple asynchronous workers. A worker can be any
 
 Some common use cases include throttling asynchronous requests to a server, or delegating tasks to a limited number of processes.
 
-# ATTRIBUTES
+# METHODS
 
-## workers
+## new
 
-An array ref of workers used for handling tasks.
+    my @args   = ( sub { ... }, ... );
+    my $broker = Broker::Async->new(@args);
+
+@args must be an array of workers used for handling tasks.
 Can be a code reference, a hash ref of [Broker::Async::Worker](https://metacpan.org/pod/Broker::Async::Worker) arguments, or a [Broker::Async::Worker](https://metacpan.org/pod/Broker::Async::Worker) object.
 Every invocation of a worker must return a [Future](https://metacpan.org/pod/Future) object.
 
 Under the hood, code and hash references are simply used to instantiate a [Broker::Async::Worker](https://metacpan.org/pod/Broker::Async::Worker) object.
 See [Broker::Async::Worker](https://metacpan.org/pod/Broker::Async::Worker) for more documentation about how these parameters are used.
-
-# METHODS
-
-## new
-
-    my $broker = Broker::Async->new(
-        workers => [ sub { ... }, ... ],
-    );
 
 ## do
 
