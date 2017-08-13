@@ -19,7 +19,7 @@ Broker::Async - broker tasks for multiple workers
         push @workers, sub { $client->request(@_) };
     }
 
-    my $broker = Broker::Async->new(@workers);
+    my $broker = Broker::Async->new(workers => \@workers);
     for my $future (map $broker->do($_), @requests) {
         my $result = $future->get;
         ...
@@ -35,6 +35,19 @@ Some common use cases include throttling asynchronous requests to a server, or d
 
 our $VERSION = "0.0.6"; # __VERSION__
 
+=head1 ATTRIBUTES
+
+=head2 workers
+
+An array ref of workers used for handling tasks.
+Can be a code reference, a hash ref of L<Broker::Async::Worker> arguments, or a L<Broker::Async::Worker> object.
+Every invocation of a worker must return a L<Future> object.
+
+Under the hood, code and hash references are simply used to instantiate a L<Broker::Async::Worker> object.
+See L<Broker::Async::Worker> for more documentation about how these parameters are used.
+
+=cut
+
 use Class::Tiny qw( workers ), {
     queue => sub {  [] },
 };
@@ -43,15 +56,9 @@ use Class::Tiny qw( workers ), {
 
 =head2 new
 
-    my @args   = ( sub { ... }, ... );
-    my $broker = Broker::Async->new(@args);
-
-@args must be an array of workers used for handling tasks.
-Can be a code reference, a hash ref of L<Broker::Async::Worker> arguments, or a L<Broker::Async::Worker> object.
-Every invocation of a worker must return a L<Future> object.
-
-Under the hood, code and hash references are simply used to instantiate a L<Broker::Async::Worker> object.
-See L<Broker::Async::Worker> for more documentation about how these parameters are used.
+    my $broker = Broker::Async->new(
+        workers => [ sub { ... }, ... ],
+    );
 
 =cut
 
@@ -63,17 +70,6 @@ sub active {
 sub available {
     my ($self) = @_;
     return grep { $_->available } @{ $self->workers };
-}
-
-sub BUILDARGS {
-    my ($class, @args) = @_;
-    if (not @args) {
-        croak "${class}::new must be passed an array of workers";
-    } elsif ($args[0] eq 'workers') {
-        return { @args };
-    } else {
-        return { workers => \@args };
-    }
 }
 
 sub BUILD {
