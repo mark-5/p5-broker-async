@@ -37,6 +37,12 @@ our $VERSION = "0.0.6"; # __VERSION__
 
 =head1 ATTRIBUTES
 
+=head2 adaptor
+
+A code ref used for generating futures. This will be passed a Broker::Async object, and expected to return a new future.
+
+This is required if there are no workers. Otherwise the default adaptor will be used, which generates futures from an active worker.
+
 =head2 workers
 
 An array ref of workers used for handling tasks.
@@ -48,9 +54,30 @@ See L<Broker::Async::Worker> for more documentation about how these parameters a
 
 =cut
 
-use Class::Tiny qw( workers ), {
-    queue => sub {  [] },
+use Class::Tiny {
+    adaptor => sub { \&default_adaptor },
+    queue   => sub { []                },
+    workers => sub { []                },
 };
+
+sub default_adaptor {
+    my ($self) = @_;
+    my @active_futures = map $_->active, $self->active;
+    if (not @active_futures) {
+        if (not @{ $self->workers }) {
+            croak "cannot use the default adaptor without any workers";
+        } else {
+            croak "cannot not find any active futures";
+        }
+    }
+
+    # generate future from an existing future
+    # see Future::_new_convergent
+    my $future = $active_futures[0];
+    ref($_) eq "Future" or $future = $_, last for @active_futures;
+
+    return $future->new;
+}
 
 =head1 METHODS
 
@@ -74,24 +101,25 @@ sub available {
 
 sub BUILD {
     my ($self) = @_;
-    for my $name (qw( workers )) {
-        croak "$name attribute required" unless defined $self->$name;
-    }
-
     my $workers = $self->workers;
     croak "workers attribute must be an array ref: received $workers"
         unless ref($workers) eq 'ARRAY';
 
-    for (my $i = 0; $i < @$workers; $i++) {
-        my $worker = $workers->[$i];
-
-        my $type = ref($worker);
-        if ($type eq 'CODE') {
-            $workers->[$i] = Broker::Async::Worker->new({code => $worker});
-        } elsif ($type eq 'HASH') {
-            $workers->[$i] = Broker::Async::Worker->new($worker);
-        }
+    if (not @$workers and $self->adaptor eq \&default_adaptor) {
+        croak "workers or adaptor attribute is required";
     }
+
+    for (my $i = 0; $i < @$workers; $i++) {
+        $workers->[$i] = _to_worker($workers->[$i]);
+    }
+}
+
+sub _to_worker {
+    my ($arg) = @_;
+    my $type  = ref($arg);
+    return $type eq 'CODE' ? Broker::Async::Worker->new({code => $arg})
+         : $type eq 'HASH' ? Broker::Async::Worker->new($arg)
+         : $arg;
 }
 
 =head2 do
@@ -116,18 +144,16 @@ sub do {
     $self->process_queue;
 
     my $future;
-    if (my @active_futures = map $_->active, $self->active) {
-        # generate future from an existing future
-        # see Future::_new_convergent
-        my $_future = $active_futures[0];
-        ref($_) eq "Future" or $_future = $_, last for @active_futures;
-
-        $future = $_future->new;
-        push @{ $self->queue }, {args => \@args, future => $future};
-    } elsif (my ($available_worker) = $self->available) {
+    if (my ($available_worker) = $self->available) {
         # should only be here if there's nothing active and nothing queued
         # so start the task and return it's future
         $future = $self->do_worker($available_worker, @args);
+    } else {
+        $future = $self->adaptor->($self);
+        if (not( blessed($future) and $future->isa('Future') )) {
+            croak "adaptor @{[ $self->adaptor ]} did not return a Future: returned $future";
+        }
+        push @{ $self->queue }, {args => \@args, future => $future};
     }
 
     # start any recently queued tasks, if there are available workers

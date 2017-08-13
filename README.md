@@ -28,6 +28,12 @@ Some common use cases include throttling asynchronous requests to a server, or d
 
 # ATTRIBUTES
 
+## adaptor
+
+A code ref used for generating futures. This will be passed a Broker::Async object, and expected to return a new future.
+
+This is required if there are no workers. Otherwise the default adaptor will be used, which generates futures from an active worker.
+
 ## workers
 
 An array ref of workers used for handling tasks.

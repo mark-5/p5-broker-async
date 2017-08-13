@@ -2,9 +2,22 @@ use strict;
 use warnings;
 use Broker::Async;
 use Broker::Async::Worker;
+use Future;
 use List::Util qw( shuffle );
 use Test::Broker::Async::Utils;
 use Test::More;
+
+subtest 'adding workers can be deferred' => sub {
+    my $broker = Broker::Async->new(adaptor => sub { Future->new });
+    $broker->do($_) for 1 .. 3;
+
+    my $trace = new_tracer();
+    $broker->add_worker($trace->worker) for 1 .. 2;
+
+    is_deeply $trace->live,
+              [1, 2],
+              'broker starts queued tasks when workers added';
+};
 
 subtest 'multi-worker concurrency' => sub {
     my $trace  = new_tracer();
