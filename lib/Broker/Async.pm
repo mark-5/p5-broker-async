@@ -161,6 +161,44 @@ sub do {
     return $future;
 }
 
+=head2 add_worker
+
+    my $worker = $broker->add_worker( sub { ... } );
+
+=cut
+
+sub add_worker {
+    my ($self, $arg) = @_;
+    my $worker = _to_worker($arg);
+
+    push @{ $self->workers }, $worker;
+    $self->process_queue;
+
+    return $worker;
+}
+
+=head2 remove_worker
+
+    my $removed = $broker->remove_worker( $worker );
+
+=cut
+
+sub remove_worker {
+    my ($self, $worker) = @_;
+    my $workers = $self->workers;
+
+    my $removed;
+    for (my $i = 0; $i < @$workers; $i++) {
+        my $_worker = $workers->[$i];
+        if ($_worker eq $worker) {
+            ($removed) = splice(@$workers, $i, 1);
+            last;
+        }
+    }
+
+    return $removed;
+}
+
 sub do_worker {
     weaken(my $self = shift);
     my ($worker, @args) = @_;

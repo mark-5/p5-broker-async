@@ -1,4 +1,5 @@
 {{$NEXT}}
+  - Allow adding and removing workers
   - Defer tasks when no workers available
   - Fix travis-ci runtime requirement
 

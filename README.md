@@ -62,6 +62,14 @@ Returns a [Future](https://metacpan.org/pod/Future) object that resolves when th
 There is no guarantee when a worker will be called, that depends on when a worker becomes available.
 However, calls are guaranteed to be invoked in the order they are seen by $broker->do.
 
+## add\_worker
+
+    my $worker = $broker->add_worker( sub { ... } );
+
+## remove\_worker
+
+    my $removed = $broker->remove_worker( $worker );
+
 # AUTHOR
 
 Mark Flickinger <maf@cpan.org>
